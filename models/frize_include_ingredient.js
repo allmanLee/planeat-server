@@ -4,11 +4,7 @@ module.exports = function(sequelize, DataTypes) {
     frize_id: {
       type: DataTypes.CHAR(32),
       allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'frize',
-        key: 'frize_id'
-      }
+      primaryKey: true
     },
     frinclude_ingredient: {
       type: DataTypes.STRING(45),

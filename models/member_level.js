@@ -4,11 +4,7 @@ module.exports = function(sequelize, DataTypes) {
     mem_id: {
       type: DataTypes.CHAR(32),
       allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'member',
-        key: 'mem_id'
-      }
+      primaryKey: true
     },
     mle_level: {
       type: DataTypes.INTEGER,

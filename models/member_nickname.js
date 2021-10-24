@@ -9,11 +9,7 @@ module.exports = function(sequelize, DataTypes) {
     mem_id: {
       type: DataTypes.CHAR(32),
       allowNull: false,
-      references: {
-        model: 'member',
-        key: 'mem_id'
-      },
-      unique: "fk_member_nickname_member1"
+      unique: "mem_id_UNIQUE"
     },
     mni_nickname: {
       type: DataTypes.STRING(45),

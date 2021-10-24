@@ -9,20 +9,12 @@ module.exports = function(sequelize, DataTypes) {
     frize_id: {
       type: DataTypes.CHAR(32),
       allowNull: false,
-      references: {
-        model: 'frize',
-        key: 'frize_id'
-      },
-      unique: "fk_frize_share_frize1"
+      unique: "frize_id_UNIQUE"
     },
     mem_id: {
       type: DataTypes.CHAR(32),
       allowNull: false,
-      references: {
-        model: 'member',
-        key: 'mem_id'
-      },
-      unique: "fk_frize_share_member1"
+      unique: "mem_id_UNIQUE"
     }
   }, {
     sequelize,
