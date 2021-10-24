@@ -6,21 +6,23 @@ require("dotenv").config();
 //토큰키 생성
 const createToken = () => crypto.randomBytes(20).toString("hex");
 
-//이메일로 사용자 식별아이디 검색
-const searchedIdByQuery = async (req) => {
-  let result = await models.member.findOne({
-    where: {
-      mem_email: req.body.email,
-    },
-  });
-  const userId = await result.dataValues.guid;
-  console.log(userId);
-  return userId;
-};
+//이메일로 아이디를 검색해서 멤버의 아이디를 리턴한다.
+async function searchedId(email) {
+  let id = await models.member
+    .findOne({
+      attributes: ["mem_id"],
+      where: { mem_email: email },
+    })
+    .then((data) => data.mem_id)
+    .catch((err) => Promise.reject(err));
+  return id;
+}
 
 //이메일 인증 인증키 전송_이메일 보내기 API
 const SendAuthEmail = async function (req, res) {
   try {
+    const email = req.body.email;
+    const id = await searchedId(email);
     const token = createToken();
     const emailOption = {
       from: "LAFTEL Team <leeyoujun61@gmail.com>",
@@ -30,9 +32,8 @@ const SendAuthEmail = async function (req, res) {
     };
 
     const dataObj = {
+      mem_id: id,
       auth_token: token,
-      auth_email: req.body.email,
-      auth_id: "a",
     };
 
     await models.auth_tmp
@@ -43,11 +44,8 @@ const SendAuthEmail = async function (req, res) {
       .catch((err) => {
         console.log(err);
         if (err.name === "SequelizeUniqueConstraintError") {
-          models.auth_email
-            .update(
-              { auth_code: token },
-              { where: { auth_email: dataObj.auth_email } }
-            )
+          models.auth_tmp
+            .update({ auth_token: token }, { where: { mem_id: id } })
             .then(function () {
               console.log("변경완료");
             });
@@ -107,7 +105,7 @@ const SendAuthEmail = async function (req, res) {
 const SendChangePasswordEmail = async function (req, res) {
   try {
     const token = createToken;
-    const userId = searchedIdByQuery(req);
+    const userId = searchedId(req);
 
     if (userId != null) {
       const data = {
@@ -165,7 +163,8 @@ const SendChangePasswordEmail = async function (req, res) {
         subject: "안녕하세요 Laftel 고객님. 비밀번호를 변경해주세요.",
         html: `<a href="http://localhost:3000/reset/?key=${token}">비밀번호 변경 바로가기</a>`,
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         return Promise.reject({
           status: 409,
           success: false,
