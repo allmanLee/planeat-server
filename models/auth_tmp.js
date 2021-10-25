@@ -6,6 +6,7 @@ module.exports = function (sequelize, DataTypes) {
       mem_id: {
         type: DataTypes.CHAR(32),
         allowNull: false,
+        unique: "mem_id_UNIQUE",
       },
       auth_token: {
         type: DataTypes.STRING(45),
@@ -29,6 +30,12 @@ module.exports = function (sequelize, DataTypes) {
           unique: true,
           using: "BTREE",
           fields: [{ name: "auth_token" }],
+        },
+        {
+          name: "mem_id_UNIQUE",
+          unique: true,
+          using: "BTREE",
+          fields: [{ name: "mem_id" }],
         },
       ],
     }
