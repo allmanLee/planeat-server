@@ -9,7 +9,7 @@ router.post("/frize/ingredientGet", frizeAPI.frizeIngredientGet);
 //냉장고 재료 추가 및 삭제
 router.post("/frize/ingredient", frizeAPI.frizeIngredient);
 
-//해당 유저의 냉장고고를 삭제, 추가, 검색을 하는 API
+//해당 유저의 냉장고를 삭제, 추가, 검색을 하는 API
 //유저 냉장고 검색
 router.post("/frize/AllFrizeGet", frizeAPI.AllFrizeGet);
 

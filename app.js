@@ -1,6 +1,7 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var api = require("./routes/api");
+var cors = require("cors");
 var app = express();
 require("dotenv").config();
 //const config = require("./config.js")   //jwt
@@ -9,6 +10,7 @@ require("dotenv").config();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cors());
 
 app.use("/api", api);
 

@@ -84,16 +84,17 @@ async function MemberCheckEmail(req, res) {
         message: "unexist",
       });
     } else {
-      if (result === "email") {
+      if (result.mem_sns === "email") {
         res.status(200).json({
           success: false,
           message: "exist, this email have been registerd to email user",
         });
+      } else {
+        res.status(200).json({
+          success: true,
+          message: "exist, but not have been registered with email",
+        });
       }
-      res.status(200).json({
-        success: true,
-        message: "exist, but not have been registered with email",
-      });
     }
   } catch (err) {
     res.status(err.status || 500).json({

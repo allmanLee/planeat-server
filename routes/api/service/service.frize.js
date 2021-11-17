@@ -208,9 +208,9 @@ async function frizeIngredientGet(req, res) {
 const frizeIngredient = async function (req, res) {
   try {
     const memEmail = req.body.email;
-    const frizeName = req.body.frize_name;
-    const ingredientAdd = req.body.ingredient_add;
-    const ingredientDelelte = req.body.ingredient_delete;
+    const frizeName = req.body.frizeName;
+    const ingredientAdd = req.body.ingredientAdd;
+    const ingredientDelelte = req.body.ingredientDelete;
     const ingredientAddObj = ingredientAdd.reduce((acc, el) => {
       return {
         ...acc,
