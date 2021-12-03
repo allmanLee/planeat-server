@@ -12,12 +12,14 @@ function initModels(sequelize) {
   var auth_tmp = _auth_tmp(sequelize, DataTypes);
   var foot_ingredient = _foot_ingredient(sequelize, DataTypes);
   var frize = _frize(sequelize, DataTypes);
-  var frize_include_ingredient = _frize_include_ingredient(sequelize, DataTypes);
+  var frize_include_ingredient = _frize_include_ingredient(
+    sequelize,
+    DataTypes
+  );
   var frize_share = _frize_share(sequelize, DataTypes);
   var member = _member(sequelize, DataTypes);
   var member_level = _member_level(sequelize, DataTypes);
   var member_nickname = _member_nickname(sequelize, DataTypes);
-
 
   return {
     auth_tmp,
