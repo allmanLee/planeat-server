@@ -6,10 +6,10 @@ require("dotenv").config();
 //로그인 SQL 컨트롤러
 const login = async function (req, res) {
   try {
-    const result = await models.user
+    const result = await models.member
       .findOne({
         where: {
-          email: req.body.email,
+          mem_email: req.body.email,
         },
       })
       .catch((err) => {
@@ -20,18 +20,21 @@ const login = async function (req, res) {
         });
       });
 
-    await new Promise((resolve, reject) => {
+    await new Promise(async (resolve, reject) => {
       if (result != null) {
-        const dbPassword = result.dataValues.pwd;
+        const dbPassword = result.dataValues.mem_pw;
         const inputPassword = req.body.password;
-        const salt = result.dataValues.salt;
+        const salt = result.dataValues.mem_pw_salt;
+        console.log(salt);
         const hashPassword = crypto
           .createHash("sha512")
           .update(inputPassword + salt)
-          .digest("hex");
+          .digest("base64");
+        console.log(hashPassword);
+        console.log(dbPassword);
         if (dbPassword === hashPassword) {
           const token = jwt.sign(
-            { username: req.body.email },
+            { mem_email: req.body.email },
             process.env.JWTSECRET_KEY,
             {
               algorithm: "HS256",
@@ -39,18 +42,23 @@ const login = async function (req, res) {
             }
           );
           const refresh_token = jwt.sign(
-            { username: req.body.email },
+            { mem_email: req.body.email },
             process.env.REF_JWTSECRET_KEY,
             {
               algorithm: "HS256",
               expiresIn: "30d",
             }
           );
+          models.member.update(
+            { mem_ref_token: refresh_token, mem_recent_token: token },
+            { where: { mem_email: req.body.email } }
+          );
+
           return res.status(200).json({
             success: true,
             code: 200,
             message: "successed login",
-            returnObj: { token: token, refresh_token: refresh_token },
+            returnObj: { token: token, ref_token: refresh_token },
           });
         } else {
           //res.redirect("/user/login");
@@ -80,10 +88,9 @@ const login = async function (req, res) {
     res.status(err.status || 500).json({
       success: false,
       code: err.status || 500,
-      status: err.data.name,
       message: err.data.message,
     });
   }
 };
 
-exports = { login };
+module.exports = { login };

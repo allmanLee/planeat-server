@@ -1,10 +1,12 @@
 const express = require("express");
 const jwt_check = require("../../../middlewares/auth");
+const authLoginUser = require("./auth.loginUser");
 const authRegisterAPI = require("./auth.registerUser");
 const authSendEmailAPI = require("./auth.sendEmail");
 const router = express.Router();
 
 //회원가입 POST API
+router.post("/login", authLoginUser.login);
 router.post("/register", authRegisterAPI.MemberRegister);
 
 //이메일 중복 확인 API

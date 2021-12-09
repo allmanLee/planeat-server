@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-
+const models = require("../models");
 const authMiddleware = (req, res, next) => {
   // read the token from header or url
   let token = req.headers["x-access-token"] || req.query.token;
@@ -10,7 +10,7 @@ const authMiddleware = (req, res, next) => {
     return res.status(403).json({
       success: false,
       message: "not logged in",
-      error,
+      // error
     });
   }
 
@@ -52,13 +52,17 @@ const authMiddleware = (req, res, next) => {
         refreshTokenVerify
           .then((decoded) => {
             //token refresh issue function
-            //console.log(decoded);
+
             token = jwt.sign(
               { username: decoded.username },
               process.env.JWTSECRET_KEY,
               { algorithm: "HS256", expiresIn: "1m" }
             );
             req.headers["x-access-token"] = token;
+            models.member.update(
+              { mem_recent_token: token },
+              { where: { mem_ref_token: refreshToken } }
+            );
             console.log(req.headers["x-access-token"]);
             // res.status(200).json({
             //   success: true,

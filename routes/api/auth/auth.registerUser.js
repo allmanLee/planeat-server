@@ -85,7 +85,7 @@ async function MemberCheckEmail(req, res) {
       });
     } else {
       if (result.mem_sns === "email") {
-        res.status(200).json({
+        res.status(403).json({
           success: false,
           message: "exist, this email have been registerd to email user",
         });
@@ -100,8 +100,8 @@ async function MemberCheckEmail(req, res) {
     res.status(err.status || 500).json({
       success: false,
       code: err.status || 500,
-      status: err.data.name,
-      message: err.data.message,
+      status: err.data.name || err.name,
+      message: err.data.message || err.message,
     });
   }
 }

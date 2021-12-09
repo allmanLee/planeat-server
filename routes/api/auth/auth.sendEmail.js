@@ -23,7 +23,7 @@ const SendAuthEmail = async function (req, res) {
   try {
     const email = req.body.email;
     const id = await searchedId(email);
-    const token = createToken();
+    const token = createToken().substring(0, 8);
     const emailOption = {
       from: "LAFTEL Team <leeyoujun61@gmail.com>",
       to: "muenzz119@naver.com",
