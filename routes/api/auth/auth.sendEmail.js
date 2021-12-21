@@ -25,9 +25,10 @@ const SendAuthEmail = async function (req, res) {
     const id = await searchedId(email);
     const token = createToken().substring(0, 8);
     const emailOption = {
-      from: "LAFTEL Team <leeyoujun61@gmail.com>",
+      from: "PLANEAT Team <leeyoujun61@gmail.com>",
       to: "muenzz119@naver.com",
-      subject: "안녕하세요 Laftel 고객님. 인증키를 발급받았습니다.",
+      subject:
+        "안녕하세요 PlANEAT(냉장고 파먹는 레시피) 이용자님. 인증키를 발급받았습니다.",
       html: `고객님의 인증키는 ${token}입니다.`,
     };
 
@@ -40,6 +41,15 @@ const SendAuthEmail = async function (req, res) {
       .create(dataObj)
       .then(function () {
         console.log("삽입완료");
+        const randomToken = createToken().substring(0, 8);
+        //120초(2분)후에 임의의 토큰값으로 제변경
+        setTimeout(() => {
+          models.auth_tmp
+            .update({ auth_token: randomToken }, { where: { mem_id: id } })
+            .then(function () {
+              console.log("변경완료");
+            });
+        }, 120000);
       })
       .catch((err) => {
         console.log(err);
@@ -48,6 +58,18 @@ const SendAuthEmail = async function (req, res) {
             .update({ auth_token: token }, { where: { mem_id: id } })
             .then(function () {
               console.log("변경완료");
+              const randomToken = createToken().substring(0, 8);
+              //120초(2분)후에 임의의 토큰값으로 제변경
+              setTimeout(() => {
+                models.auth_tmp
+                  .update(
+                    { auth_token: randomToken },
+                    { where: { mem_id: id } }
+                  )
+                  .then(function () {
+                    console.log("변경완료");
+                  });
+              }, 120000);
             });
         } else {
           return Promise.reject({
@@ -158,9 +180,10 @@ const SendChangePasswordEmail = async function (req, res) {
 
     let info = await transporter
       .sendMail({
-        from: "LAFTEL Team <leeyoujun61@gmail.com>",
+        from: "PLANEAT Team <leeyoujun61@gmail.com>",
         to: "muenzz119@naver.com",
-        subject: "안녕하세요 Laftel 고객님. 비밀번호를 변경해주세요.",
+        subject:
+          "안녕하세요 PlANEAT(냉장고 파먹는 레시피) 이용자님. 비밀번호를 변경해주세요.",
         html: `<a href="http://localhost:3000/reset/?key=${token}">비밀번호 변경 바로가기</a>`,
       })
       .catch((err) => {
