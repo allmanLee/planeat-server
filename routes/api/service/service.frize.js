@@ -26,7 +26,9 @@ async function findIngredientObj(frizeId, option) {
                 name: el.name,
                 engName: el.engName,
                 updatedDate: el.updatedDate,
+                expirationDate: el.expirationDate,
                 amount: el.amount,
+                memo: el.memo,
                 id: el.id,
               },
             };
@@ -51,7 +53,7 @@ async function updateIngredientObj(frizeId, ingredientObj, addObj, cancleArr) {
   if (arguments[3] === undefined) {
     await models.frize_include_ingredient
       .update(
-        { frinclude_ingredient: resultObj },
+        { frinclude_ingredient: Object.values(resultObj) },
         { where: { frize_id: frizeId } }
       )
       .catch((err) => Promise.reject(err));
@@ -68,7 +70,6 @@ async function updateIngredientObj(frizeId, ingredientObj, addObj, cancleArr) {
       )
       .catch((err) => Promise.reject(err));
   }
-  console.log(Object.values(resultObj));
   return Object.values(resultObj);
 }
 
@@ -114,6 +115,10 @@ async function frizeAdd(req, res) {
         frize_cate: "nomal",
         frize_is_shared: false,
         mem_id: memId,
+      });
+      await models.frize_include_ingredient.create({
+        frize_id: frizeId,
+        frinclude_ingredient: [],
       });
       res.status(200).json({
         status: "Success",
@@ -216,12 +221,6 @@ async function AllFrizeGet(req, res) {
 //냉장고에 재료들을 검색한다.
 async function frizeIngredientGet(req, res) {
   try {
-    //아이디를 찾아서 수정하는 방식에서 냉장고 아이템을 그냥 가져오는것으로 수정 함
-    // const inputedEmail = req.body.email;
-    // const inputedFrizeName = req.body.frizeName;
-    // const id = await searchedId(inputedEmail);
-    //const frizeData = await searchedFrizeId(id, inputedFrizeName);
-    // const frizeId = await frizeData.rows[0].frize_id;
     const frizeId = req.body.frizeId;
     const ingredientObj = await findIngredientObj(frizeId, 1);
 
@@ -239,15 +238,87 @@ async function frizeIngredientGet(req, res) {
     });
   }
 }
+//냉장고에 유통얼마 남지 않는 재료들을 검색한다.
+async function frizeIngredientAlaramGet(req, res) {
+  try {
+    //아이디를 찾아서 수정하는 방식에서 냉장고 아이템을 그냥 가져오는것으로 수정 함
+    const frizesId = req.body.frizesId;
+    let result = await frizesId.reduce(async (acc, id) => {
+      const ingredientObj = await findIngredientObj(id, 1);
+      const ACC = await acc;
+      const ingredientAddFrizeId = await ingredientObj.map((el) => {
+        return { ...el, frizeId: id };
+      });
+      console.log(ingredientAddFrizeId);
+      return [...ACC, ...ingredientAddFrizeId];
+    }, []);
+
+    //날짜 거르기
+    let DateFilter = await result.filter((el) => {
+      const exDateArr = el.expirationDate.split("-").map((el) => Number(el));
+      const upDateArr = el.updatedDate.split("-").map((el) => Number(el));
+      const upDate = new Date(
+        `${upDateArr[0]}/${upDateArr[1]}/${upDateArr[2] + 1}`
+      );
+      const exDate = new Date(
+        `${exDateArr[0]}/${exDateArr[1]}/${exDateArr[2] + 1}`
+      );
+      const dateDifference =
+        (exDate.getTime() - upDate.getTime()) / (1000 * 60 * 60 * 24);
+      return dateDifference <= 7;
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "성공적으로 frizesID의 이메일을 가져왔습니다.",
+      dataObj: DateFilter,
+    });
+  } catch (err) {
+    res.status(err.status || 500).json({
+      success: false,
+      message: err.message,
+      //errorCode: err.data.errorCode || err.data.code,
+      //message: err.data.message,
+    });
+  }
+}
+
+//냉장고에 재료를 수정한다.
+async function frizeIngredientModify(req, res) {
+  try {
+    const frizeId = req.body.frizeId;
+    const frizeModifyData = req.body.frizeModifyData;
+    const ingredientId = req.body.ingredientId;
+    const ingredientObj = await findIngredientObj(frizeId, 2);
+
+    ingredientObj[ingredientId] = {
+      ...ingredientObj[ingredientId],
+      ...frizeModifyData,
+    };
+
+    await models.frize_include_ingredient
+      .update(
+        { frinclude_ingredient: Object.values(ingredientObj) },
+        { where: { frize_id: frizeId } }
+      )
+      .catch((err) => Promise.reject(err));
+
+    res.status(200).json({
+      success: true,
+      message: "성공적으로 frizesID의 이메일을 가져왔습니다.",
+      dataObj: Object.values(ingredientObj),
+    });
+  } catch (err) {
+    res.status(err.status || 500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+}
 
 //냉장고에 재료를 추가 또는 삭제
 const frizeIngredient = async function (req, res) {
   try {
-    // const memEmail = req.body.email;
-    // const frizeName = req.body.frizeName;
-    // const memId = await searchedId(memEmail);
-    // const frizeSearched = await searchedFrizeId(memId, frizeName);
-    // const frizeId = (await frizeSearched.rows[0].frize_id) || null;
     const frizeId = req.body.frizeId;
     const ingredientDelelte = req.body.ingredientDelete;
     const ingredientAdd = req.body.ingredientAdd;
@@ -260,6 +331,8 @@ const frizeIngredient = async function (req, res) {
                 name: el.name,
                 engName: el.engName,
                 updatedDate: el.updatedDate,
+                expirationDate: el.expirationDate,
+                memo: el.memo,
                 amount: el.amount,
                 id: el.id,
               },
@@ -268,10 +341,8 @@ const frizeIngredient = async function (req, res) {
         : null;
     let updatedIngredients = [];
     const ingredientObj = await findIngredientObj(frizeId, 2); //현재 재료데이터
-    console.log("검색된 재료2", ingredientObj);
-    if (ingredientObj != null) {
+    if (ingredientObj != null || ingredientObj.length !== 0) {
       //frizeId가 frize_include_ingredient 테이블에 존재할경우 업데이트
-
       updatedIngredients = await updateIngredientObj(
         frizeId,
         ingredientObj,
@@ -301,6 +372,8 @@ const frizeIngredient = async function (req, res) {
 
 module.exports = {
   frizeIngredientGet,
+  frizeIngredientAlaramGet,
+  frizeIngredientModify,
   frizeIngredient,
   frizeAdd,
   frizeDelete,
