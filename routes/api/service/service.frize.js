@@ -24,7 +24,6 @@ async function findIngredientObj(frizeId, option) {
               ...acc,
               [el.id]: {
                 name: el.name,
-                engName: el.engName,
                 updatedDate: el.updatedDate,
                 expirationDate: el.expirationDate,
                 amount: el.amount,
@@ -329,7 +328,6 @@ const frizeIngredient = async function (req, res) {
               ...acc,
               [el.id]: {
                 name: el.name,
-                engName: el.engName,
                 updatedDate: el.updatedDate,
                 expirationDate: el.expirationDate,
                 memo: el.memo,
