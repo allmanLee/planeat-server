@@ -3,6 +3,7 @@ const jwt_check = require("../../../middlewares/auth");
 const authLoginUser = require("./auth.loginUser");
 const authRegisterAPI = require("./auth.registerUser");
 const authSendEmailAPI = require("./auth.sendEmail");
+const refreshAccessToken = require("../../../middlewares/refresh");
 const router = express.Router();
 
 //회원가입 POST API
@@ -23,6 +24,9 @@ router.post(
 
 //인증키 확인
 router.post("/check_authkey", authRegisterAPI.MemberCheckAuthKey);
+
+//access 토큰 재발급
+router.get("/refresh", refreshAccessToken);
 
 //JWT 확인
 router.use("/check", jwt_check);

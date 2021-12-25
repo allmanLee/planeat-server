@@ -100,7 +100,7 @@ async function frizeAdd(req, res) {
   try {
     //db에 해당 냉장고와 동일한 이름이 있는지 검색
     //없으면 냉장고를 추가한다.
-    const memId = await searchedId(req.body.email);
+    const memId = await searchedId(req.decoded.mem_email);
     const frizeName = req.body.frizeName;
     const frizeId = v4().replace(/-/gi, "");
     const frizeExit = await searchedFrizeId(memId, frizeName);
@@ -147,7 +147,7 @@ async function frizeDelete(req, res) {
   try {
     //db에 해당 냉장고와 동일한 이름이 있는지 검색
     //없으면 냉장고를 추가한다.
-    const memId = await searchedId(req.body.email);
+    const memId = await searchedId(req.decoded.mem_email);
     const frizeName = req.body.frizeName;
     const frizeSearched = await searchedFrizeId(memId, frizeName);
     const frizeId = frizeSearched.rows[0].frize_id;
@@ -184,7 +184,7 @@ async function frizeDelete(req, res) {
 async function AllFrizeGet(req, res) {
   try {
     const frizeCate = req.body.frize_category || null;
-    const memId = await searchedId(req.body.email);
+    const memId = await searchedId(req.decoded.mem_email);
     let frizeFindOpt =
       frizeCate === null
         ? { mem_id: memId }

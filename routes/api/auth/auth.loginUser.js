@@ -20,12 +20,11 @@ const login = async function (req, res) {
         });
       });
 
-    await new Promise(async (resolve, reject) => {
+    await new Promise((resolve, reject) => {
       if (result != null) {
         const dbPassword = result.dataValues.mem_pw;
         const inputPassword = req.body.password;
         const salt = result.dataValues.mem_pw_salt;
-        console.log(salt);
         const hashPassword = crypto
           .createHash("sha512")
           .update(inputPassword + salt)
@@ -38,12 +37,12 @@ const login = async function (req, res) {
             process.env.JWTSECRET_KEY,
             {
               algorithm: "HS256",
-              expiresIn: "1m",
+              expiresIn: "20m",
             }
           );
           const refresh_token = jwt.sign(
             { mem_email: req.body.email },
-            process.env.REF_JWTSECRET_KEY,
+            process.env.JWTSECRET_KEY,
             {
               algorithm: "HS256",
               expiresIn: "30d",
