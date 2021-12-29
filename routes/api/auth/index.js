@@ -4,11 +4,16 @@ const authLoginUser = require("./auth.loginUser");
 const authRegisterAPI = require("./auth.registerUser");
 const authSendEmailAPI = require("./auth.sendEmail");
 const refreshAccessToken = require("../../../middlewares/refresh");
+const { ControllerToSNS } = require("./auth.controllerSNS");
 const router = express.Router();
 
-//회원가입 POST API
+//회원가입
 router.post("/login", authLoginUser.login);
+
+//회원가입 POST API
 router.post("/register", authRegisterAPI.MemberRegister);
+//SNS 로그인 및 회원가입 DB 컨트롤러
+router.post("/controllerToSNS", ControllerToSNS);
 
 //이메일 중복 확인 API
 router.get("/check_email", authRegisterAPI.MemberCheckEmail);

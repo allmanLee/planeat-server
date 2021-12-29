@@ -357,7 +357,7 @@ const frizeIngredient = async function (req, res) {
     }
     res.status(200).json({
       success: true,
-      message: "성공적으로 제료가 추가되었습니다.",
+      message: "성공적으로 재료가 추가되었습니다.",
       dataObj: updatedIngredients,
     });
   } catch (err) {

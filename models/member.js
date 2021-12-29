@@ -14,11 +14,11 @@ module.exports = function (sequelize, DataTypes) {
       },
       mem_pw: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
       mem_pw_salt: {
         type: DataTypes.STRING(45),
-        allowNull: false,
+        allowNull: true,
       },
       mem_email_auth: {
         type: DataTypes.BOOLEAN,
