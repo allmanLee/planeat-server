@@ -102,6 +102,7 @@ const ControllerToSNS = async function (req, res) {
     res.status(err.status || 500).json({
       success: false,
       code: err.status || 500,
+      message: err.message,
     });
   }
 };
