@@ -96,6 +96,7 @@ const refreshMiddleware = (req, res, next) => {
             res.status(200).json({
               accessToken: token,
             });
+            next();
           })
           .catch(onError);
       } else {
