@@ -25,6 +25,7 @@ const refreshMiddleware = (req, res, next) => {
 
   // 토큰 디코드하는 비동기 promise 객체 생성
   const refreshDecode = new Promise((resolve, reject) => {
+    console.log("Token decode: 토큰 디코드하는 비동기 promise 객체 생성");
     jwt.verify(
       refreshToken,
       req.app.get("jwt-secret") || process.env.JWTSECRET_KEY,
@@ -44,24 +45,15 @@ const refreshMiddleware = (req, res, next) => {
     });
   };
 
-  // refresh 토큰이 없을때 에러메세지.(DB ERROR)
-  const onRecentError = (error) => {
-    res.status(403).json({
-      success: false,
-      message: error.message,
-    });
-  };
-
   // 현재 가지고있는 ACCESS 토큰이 최근에 사용한 acc토큰인지 검사
   async function FindRecentToken() {
-    let result = await models.member
+    return await models.member
       .findOne({
         attributes: ["mem_recent_token"],
         where: { mem_ref_token: refreshToken },
       })
       .then((data) => data.mem_recent_token)
-      .catch(onRecentError);
-    return result;
+      .catch((err) => Promise.reject(err));
   }
 
   //리프레시 토큰으로 이메일 찾기
@@ -72,7 +64,7 @@ const refreshMiddleware = (req, res, next) => {
         where: { mem_ref_token: refreshToken },
       })
       .then((data) => data.mem_email)
-      .catch(onRecentError);
+      .catch((err) => Promise.reject(err));
     return result;
   }
 
@@ -83,35 +75,42 @@ const refreshMiddleware = (req, res, next) => {
       expiresIn: "20m",
     });
 
-  //최근 접근 토큰이 일치하지 않을경우
-  const ErrRecentTokenMismatch = () => {
-    res.status(403).json({
-      success: false,
-      message: "최근 접근 토큰과 해당 토큰이 불일치",
-    });
-  };
-
   // process the promise
   async function recentTokenComparison() {
-    const recent = await FindRecentToken();
-    if (token === recent) {
-      refreshDecode
-        .then(async (decoded) => {
-          const email = await FindEmailbyRefresh();
-          req.decoded = decoded;
-          const token = await createToken(email);
-          models.member.update(
-            { mem_recent_token: token },
-            { where: { mem_ref_token: refreshToken } }
-          );
-          res.status(200).json({
-            accessToken: token,
-          });
-        })
-        .catch(onError);
-    } else ErrRecentTokenMismatch();
+    try {
+      console.log("프로미스 객체: 실행");
+      const recent = await FindRecentToken();
+      if (token === recent) {
+        console.log("프로미스 객체: 토큰값 일치");
+        await refreshDecode
+          .then(async (decoded) => {
+            const email = await FindEmailbyRefresh();
+            req.decoded = decoded;
+            const token = await createToken(email);
+            models.member.update(
+              { mem_recent_token: token },
+              { where: { mem_ref_token: refreshToken } }
+            );
+          })
+          .then(() => {
+            res.status(200).json({
+              accessToken: token,
+            });
+          })
+          .catch(onError);
+      } else {
+        return await Promise.reject({
+          success: false,
+          message: "최근 접근 토큰과 해당 토큰이 불일치",
+        });
+      }
+    } catch (err) {
+      res.status(403).json({
+        success: false,
+        message: err.message,
+      });
+    }
   }
-
   recentTokenComparison();
 };
 

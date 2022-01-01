@@ -79,7 +79,7 @@ const ControllerToSNS = async function (req, res) {
     const LoginToSNS = (email) => {
       return models.member
         .update(
-          { mem_ref_token: acToken, mem_recent_token: refToken },
+          { mem_ref_token: refToken, mem_recent_token: acToken },
           { where: { mem_email: email } }
         )
         .then(success({ method: "login", acToken, refToken }))
