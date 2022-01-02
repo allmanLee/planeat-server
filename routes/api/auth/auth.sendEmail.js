@@ -26,7 +26,7 @@ const SendAuthEmail = async function (req, res) {
     const token = createToken().substring(0, 8);
     const emailOption = {
       from: "PLANEAT Team <leeyoujun61@gmail.com>",
-      to: "muenzz119@naver.com",
+      to: email,
       subject:
         "안녕하세요 PlANEAT(냉장고 파먹는 레시피) 이용자님. 인증키를 발급받았습니다.",
       html: `고객님의 인증키는 ${token}입니다.`,
