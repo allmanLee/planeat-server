@@ -79,22 +79,23 @@ const refreshMiddleware = (req, res, next) => {
   async function recentTokenComparison() {
     try {
       console.log("프로미스 객체: 실행");
+      //최근 토큰
       const recent = await FindRecentToken();
+
       if (token === recent) {
-        console.log("프로미스 객체: 토큰값 일치");
+        const email = await FindEmailbyRefresh();
+        const newToken = await createToken(email);
         await refreshDecode
           .then(async (decoded) => {
-            const email = await FindEmailbyRefresh();
             req.decoded = decoded;
-            const token = await createToken(email);
             models.member.update(
-              { mem_recent_token: token },
+              { mem_recent_token: newToken },
               { where: { mem_ref_token: refreshToken } }
             );
           })
           .then(() => {
             res.status(200).json({
-              accessToken: token,
+              accessToken: newToken,
             });
             next();
           })
