@@ -28,7 +28,7 @@ const refreshMiddleware = (req, res, next) => {
     console.log("Token decode: 토큰 디코드하는 비동기 promise 객체 생성");
     jwt.verify(
       refreshToken,
-      req.app.get("jwt-secret") || process.env.JWTSECRET_KEY,
+      req.app.get("jwt-secret") || process.env.REF_JWTSECRET_KEY,
       (err, decoded) => {
         if (err) reject(err);
         resolve(decoded);

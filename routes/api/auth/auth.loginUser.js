@@ -42,7 +42,7 @@ const login = async function (req, res) {
           );
           const refresh_token = jwt.sign(
             { mem_email: req.body.email },
-            process.env.JWTSECRET_KEY,
+            process.env.REF_JWTSECRET_KEY,
             {
               algorithm: "HS256",
               expiresIn: "30d",
