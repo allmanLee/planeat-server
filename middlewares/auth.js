@@ -37,7 +37,6 @@ const authMiddleware = (req, res, next) => {
   accessDecode
     .then((decoded) => {
       req.decoded = decoded;
-      console.log(decoded);
       next();
     })
     .catch(onError);

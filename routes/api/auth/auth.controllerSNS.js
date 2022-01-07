@@ -5,27 +5,16 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 //이메일 중복 확인
-const emailDuplicateCheck = async (userEmail, snsType) => {
-  const errorToFind = (err) => {
-    return Promise.reject({
-      status: 500,
-      message: err.message,
-    });
-  };
-
-  const result = await models.member
+async function searchedIdWithSNS(email, sns) {
+  let id = await models.member
     .findOne({
-      attributes: ["mem_sns"],
-      where: {
-        mem_email: userEmail,
-        mem_sns: snsType,
-      },
+      attributes: ["mem_id"],
+      where: { mem_email: email, mem_sns: sns },
     })
-    .then((data) => data.mem_sns)
-    .catch((err) => errorToFind(err));
-
-  return result;
-};
+    .then((data) => data)
+    .catch((err) => err);
+  return id;
+}
 
 //SNS 로그인 컨트롤러
 const ControllerToSNS = async function (req, res) {
@@ -82,7 +71,7 @@ const ControllerToSNS = async function (req, res) {
           { mem_ref_token: refToken, mem_recent_token: acToken },
           { where: { mem_email: email } }
         )
-        .then(success({ method: "login", acToken, refToken }))
+        .then()
         .catch(error);
     };
 
@@ -90,14 +79,22 @@ const ControllerToSNS = async function (req, res) {
     const RegisterToSNS = (object) => {
       return models.member
         .create(object)
-        .then(success({ method: "register", acToken, refToken }))
+        .then()
         .catch((err) => error(err));
     };
 
-    const mem_sns = await emailDuplicateCheck(email, sns_type);
-    if (mem_sns === "kakao" || mem_sns === "naver") {
-      await LoginToSNS(email);
-    } else await RegisterToSNS(beUpdatedMem);
+    await searchedIdWithSNS(email, sns_type)
+      .then(async (data) => {
+        console.log(data);
+        if (data === null) {
+          await RegisterToSNS(beUpdatedMem);
+        }
+        await LoginToSNS(email);
+        success({ method: "register", acToken, refToken });
+      })
+      .catch(async (err) => {
+        Promise.reject(err);
+      });
   } catch (err) {
     res.status(err.status || 500).json({
       success: false,
