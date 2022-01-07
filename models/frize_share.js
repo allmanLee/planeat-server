@@ -8,15 +8,23 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: false,
         primaryKey: true,
       },
-      frize_id: {
-        type: DataTypes.CHAR(32),
-        allowNull: false,
-        unique: "frize_id_UNIQUE",
-      },
       mem_id: {
         type: DataTypes.CHAR(32),
         allowNull: false,
-        unique: "mem_id_UNIQUE",
+        references: {
+          model: "member",
+          key: "mem_id",
+        },
+        unique: "fk_frize_share_member1",
+      },
+      frize_id: {
+        type: DataTypes.CHAR(32),
+        allowNull: false,
+        references: {
+          model: "frize",
+          key: "frize_id",
+        },
+        unique: "fk_frize_share_frize1",
       },
     },
     {
@@ -41,6 +49,12 @@ module.exports = function (sequelize, DataTypes) {
           unique: true,
           using: "BTREE",
           fields: [{ name: "mem_id" }],
+        },
+        {
+          name: "frish_id_UNIQUE",
+          unique: true,
+          using: "BTREE",
+          fields: [{ name: "frish_id" }],
         },
       ],
     }

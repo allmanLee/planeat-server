@@ -7,6 +7,10 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.CHAR(32),
         allowNull: false,
         primaryKey: true,
+        references: {
+          model: "frize",
+          key: "frize_id",
+        },
       },
       frinclude_ingredient: {
         type: DataTypes.JSON,

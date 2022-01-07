@@ -6,7 +6,11 @@ module.exports = function (sequelize, DataTypes) {
       mem_id: {
         type: DataTypes.CHAR(32),
         allowNull: false,
-        unique: "mem_id_UNIQUE",
+        references: {
+          model: "member",
+          key: "mem_id",
+        },
+        unique: "fk_auth_tmp_member1",
       },
       auth_token: {
         type: DataTypes.STRING(45),

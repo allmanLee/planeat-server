@@ -44,6 +44,11 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.BOOLEAN,
         allowNull: true,
       },
+      mem_sns: {
+        type: DataTypes.STRING(45),
+        allowNull: false,
+        defaultValue: "email",
+      },
       mem_ref_token: {
         type: DataTypes.STRING(255),
         allowNull: true,
@@ -51,11 +56,6 @@ module.exports = function (sequelize, DataTypes) {
       mem_recent_token: {
         type: DataTypes.STRING(255),
         allowNull: true,
-      },
-      mem_sns: {
-        type: DataTypes.STRING(45),
-        allowNull: false,
-        defaultValue: "email",
       },
     },
     {

@@ -7,6 +7,10 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.CHAR(32),
         allowNull: false,
         primaryKey: true,
+        references: {
+          model: "member",
+          key: "mem_id",
+        },
       },
       mle_level: {
         type: DataTypes.INTEGER,
