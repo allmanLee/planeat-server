@@ -95,7 +95,11 @@ const ControllerToSNS = async function (req, res) {
     };
 
     const mem_sns = await emailDuplicateCheck(email, sns_type);
+<<<<<<< HEAD
     if (!mem_sns || mem_sns === null) return await RegisterToSNS(beUpdatedMem);
+=======
+    if (!mem_sns) return await RegisterToSNS(beUpdatedMem);
+>>>>>>> 79ffb8b91b84162c348fb8573a4ee85937beb09d
     if (mem_sns === "kakao" || mem_sns === "naver") {
       await LoginToSNS(email);
     } else await RegisterToSNS(beUpdatedMem);
