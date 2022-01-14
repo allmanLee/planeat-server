@@ -85,12 +85,13 @@ const ControllerToSNS = async function (req, res) {
 
     await searchedIdWithSNS(email, sns_type)
       .then(async (data) => {
-        console.log(data);
         if (data === null) {
           await RegisterToSNS(beUpdatedMem);
+          success({ method: "register", acToken, refToken });
+        } else {
+          await LoginToSNS(email);
+          success({ method: "login", acToken, refToken });
         }
-        await LoginToSNS(email);
-        success({ method: "register", acToken, refToken });
       })
       .catch(async (err) => {
         Promise.reject(err);
